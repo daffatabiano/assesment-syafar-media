@@ -1,8 +1,8 @@
-import Home from '../pages/Home';
-import Login from '../pages/auth/login';
-import Dashboard from '../pages/dashboard';
-import DashboardJemaah from '../pages/data-jemaah';
-import ProtectedRoute from './protectedRoute';
+import Home from '../pages/home.jsx';
+import Login from '../pages/auth/login.jsx';
+import Dashboard from '../pages/dashboard.jsx';
+import DashboardJemaah from '../pages/data-jemaah.jsx';
+import ProtectedRoute from './protectedRoute.jsx';
 
 export const routeLists = [
   {
