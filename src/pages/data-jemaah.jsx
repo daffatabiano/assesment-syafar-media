@@ -1,7 +1,7 @@
 import { FaEye } from 'react-icons/fa';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { RxCross2 } from 'react-icons/rx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const styles = {
@@ -17,6 +17,45 @@ const styles = {
 export default function DashboardJemaah() {
   const [showAdd, setShowAdd] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [province, setProvince] = useState([]);
+  const [kabupaten, setKabupaten] = useState([]);
+  const [kecamatan, setKecamatan] = useState([]);
+
+  const [notify, setNotify] = useState({});
+
+  const getProvince = async () => {
+    try {
+      const res = await axios.get(
+        'https://dev.farizdotid.com/api/daerahindonesia/provinsi'
+      );
+
+      setProvince(res.data.provinsi);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const getKabupaten = async () => {
+    try {
+      const res = await axios.get(
+        'https://dev.farizdotid.com/api/daerahindonesia/kabupaten'
+      );
+
+      setKabupaten(res.data.kabupaten);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const getKecamatan = async () => {
+    try {
+      const res = await axios.get(
+        'https://dev.farizdotid.com/api/daerahindonesia/kecamatan'
+      );
+
+      setKecamatan(res.data.kecamatan);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handleAddDataJemaah = async (e) => {
     e.preventDefault();
@@ -25,9 +64,34 @@ export default function DashboardJemaah() {
       nik: e.target.nik.value,
     };
     try {
-      const res = await axios.post('http://localhost:3000/jemaah');
-    } catch (err) {}
+      const res = await axios.post('http://localhost:3000/jemaah', body);
+      console.log(res);
+      setShowAdd(false);
+      if (res.status === 200) {
+        setNotify({
+          show: true,
+          status: 'success',
+          title: 'Success',
+          message: 'Data Jemaah Berhasil Sukses',
+        });
+      }
+    } catch (err) {
+      setNotify({
+        show: true,
+        status: 'error',
+        title: 'Error',
+        message: 'Data Jemaah Gagal Disimpan',
+      });
+    }
   };
+
+  useEffect(() => {
+    getProvince();
+    getKabupaten();
+    getKecamatan();
+  }, []);
+
+  console.log(kabupaten);
 
   return (
     <>
@@ -39,7 +103,7 @@ export default function DashboardJemaah() {
           <button
             type="button"
             onClick={() => setShowDetail(false)}
-            className="absolute right-2 top-2 text-3xl text-red-500">
+            className="absolute right-2 top-2 text-3xl text-red-500 z-[999]">
             <RxCross2 />
           </button>
         </div>
@@ -144,17 +208,19 @@ export default function DashboardJemaah() {
                 <div className="flex gap-2">
                   <label
                     htmlFor="provinsi"
-                    className="text-slate-500 flex flex-col">
+                    className="text-slate-500 flex flex-col w-full">
                     Provinsi
                     <select name="provinsi" id="" className={styles.input}>
-                      <option value="">Pilih Provinsi</option>
-                      <option value="Jawa Barat">Jawa Barat</option>
-                      <option value="Jawa Tengah">Jawa Tengah</option>
+                      {province.map((item) => (
+                        <option key={item.id} value={item.nama}>
+                          {item.nama}
+                        </option>
+                      ))}
                     </select>
                   </label>
                   <label
                     htmlFor="kabupaten"
-                    className="text-slate-500 flex flex-col">
+                    className="text-slate-500 flex flex-col w-full">
                     Kabupaten
                     <select name="kabupaten" id="" className={styles.input}>
                       <option value="">Pilih Kabupaten</option>
@@ -165,7 +231,7 @@ export default function DashboardJemaah() {
                   </label>
                   <label
                     htmlFor="kecamatan"
-                    className="text-slate-500 flex flex-col">
+                    className="text-slate-500 flex flex-col w-full">
                     Kecamatan
                     <select name="kecamatan" id="" className={styles.input}>
                       <option value="">Pilih Kecamatan</option>
@@ -287,9 +353,14 @@ export default function DashboardJemaah() {
                   </select>
                 </label>
               </div>
-              <button className="bg-emerald-500 w-full mt-8 text-white p-2 font-bold  hover:bg-emerald-600 hover:text-slate-50">
-                Simpan Data
-              </button>
+              <div className="flex gap-4 flex-row-reverse">
+                <button className="bg-emerald-500 w-full mt-8 text-white p-2 font-bold  hover:bg-emerald-600 hover:text-slate-50">
+                  Simpan Data
+                </button>
+                <button className="bg-rose-500 w-full mt-8 text-white p-2 font-bold  hover:bg-rose-600 hover:text-slate-50">
+                  Batal
+                </button>
+              </div>
             </div>
           </form>
         </div>
