@@ -6,7 +6,11 @@ export default function Home() {
       <h1>Home</h1>
       <p>untuk username: admin</p>
       <p>untuk password: admin123</p>
-      <Link to="/dashboard">dashboard</Link>
+      <Link
+        className="bg-slate-400 p-4 text-slate-50 hover:bg-slate-500 hover:text-slate-50"
+        to="/dashboard">
+        go to dashboard
+      </Link>
     </div>
   );
 }
