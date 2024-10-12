@@ -20,27 +20,45 @@ export default function DashboardJemaah() {
   const [province, setProvince] = useState([]);
   const [kabupaten, setKabupaten] = useState([]);
   const [kecamatan, setKecamatan] = useState([]);
+  const [provId, setProvId] = useState('');
+  const [kecId, setKecId] = useState('');
 
   const [notify, setNotify] = useState({});
 
   const getProvince = async () => {
     try {
       const res = await axios.get(
-        'https://dev.farizdotid.com/api/daerahindonesia/provinsi'
+        'https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json'
       );
 
-      setProvince(res.data.provinsi);
+      setProvince(res.data);
     } catch (err) {
       console.log(err);
     }
   };
+
+  const handleSelectProvince = (e) => {
+    const selectOptions = province.find((item) => item.name === e.target.value);
+    setProvId(selectOptions.id);
+  };
+
+  const handleSelectKabupaten = (e) => {
+    const selectOptions = kabupaten.find(
+      (item) => item.name === e.target.value
+    );
+
+    if (selectOptions) {
+      setKecId(selectOptions.id);
+    }
+  };
+
   const getKabupaten = async () => {
     try {
       const res = await axios.get(
-        'https://dev.farizdotid.com/api/daerahindonesia/kabupaten'
+        `https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${provId}.json`
       );
-
-      setKabupaten(res.data.kabupaten);
+      console.log(res);
+      setKabupaten(res.data);
     } catch (err) {
       console.log(err);
     }
@@ -48,14 +66,26 @@ export default function DashboardJemaah() {
   const getKecamatan = async () => {
     try {
       const res = await axios.get(
-        'https://dev.farizdotid.com/api/daerahindonesia/kecamatan'
+        `https://www.emsifa.com/api-wilayah-indonesia/api/districts/${kecId}.json`
       );
 
-      setKecamatan(res.data.kecamatan);
+      setKecamatan(res.data);
     } catch (err) {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    getProvince();
+  }, []);
+
+  useEffect(() => {
+    getKabupaten();
+  }, [provId]);
+
+  useEffect(() => {
+    getKecamatan();
+  }, [kecId]);
 
   const handleAddDataJemaah = async (e) => {
     e.preventDefault();
@@ -76,6 +106,7 @@ export default function DashboardJemaah() {
         });
       }
     } catch (err) {
+      console.log(err);
       setNotify({
         show: true,
         status: 'error',
@@ -84,14 +115,6 @@ export default function DashboardJemaah() {
       });
     }
   };
-
-  useEffect(() => {
-    getProvince();
-    getKabupaten();
-    getKecamatan();
-  }, []);
-
-  console.log(kabupaten);
 
   return (
     <>
@@ -210,10 +233,14 @@ export default function DashboardJemaah() {
                     htmlFor="provinsi"
                     className="text-slate-500 flex flex-col w-full">
                     Provinsi
-                    <select name="provinsi" id="" className={styles.input}>
+                    <select
+                      name="provinsi"
+                      id=""
+                      className={styles.input}
+                      onChange={handleSelectProvince}>
                       {province.map((item) => (
-                        <option key={item.id} value={item.nama}>
-                          {item.nama}
+                        <option key={item.id} value={item.name}>
+                          {item.name}
                         </option>
                       ))}
                     </select>
@@ -222,22 +249,33 @@ export default function DashboardJemaah() {
                     htmlFor="kabupaten"
                     className="text-slate-500 flex flex-col w-full">
                     Kabupaten
-                    <select name="kabupaten" id="" className={styles.input}>
-                      <option value="">Pilih Kabupaten</option>
-                      <option value="">Jakarta Pusat</option>
-                      <option value="">Jakarta Selatan</option>
-                      <option value="">Jakarta Utara</option>
+                    <select
+                      disabled={provId ? false : true}
+                      name="kabupaten"
+                      id=""
+                      onChange={handleSelectKabupaten}
+                      className={styles.input}>
+                      {kabupaten.map((item) => (
+                        <option key={item.id} value={item.name}>
+                          {item.name}
+                        </option>
+                      ))}
                     </select>
                   </label>
                   <label
                     htmlFor="kecamatan"
                     className="text-slate-500 flex flex-col w-full">
                     Kecamatan
-                    <select name="kecamatan" id="" className={styles.input}>
-                      <option value="">Pilih Kecamatan</option>
-                      <option value="">Tegal Timur</option>
-                      <option value="">Tegal Selatan</option>
-                      <option value="">Tegal Barat</option>
+                    <select
+                      disabled={kecId ? false : true}
+                      name="kecamatan"
+                      id=""
+                      className={styles.input}>
+                      {kecamatan.map((item) => (
+                        <option key={item.id} value={item.name}>
+                          {item.name}
+                        </option>
+                      ))}
                     </select>
                   </label>
                 </div>
